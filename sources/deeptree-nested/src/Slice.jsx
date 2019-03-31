@@ -1,56 +1,35 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
+import React, { Component, useEffect } from "react";
+import { useStore } from "easy-peasy";
 
-import { initialize, createStringId } from "./strings";
+// import { initialize, createStringId } from "./strings";
 import { TEXT_INPUT_MOD } from "./constants";
 
-const counterMapState = (state, props) => {
-  return {
-    value: state.counters[props.idx]
-  };
-};
-
-const Counter = ({ value }) => {
+const Counter = ({ idx }) => {
+  const value = useStore(state => state.counters[idx], [idx]);
   return <div>Value: {value}</div>;
 };
 
 Counter.displayName = "Counter";
 
-const ConnectedCounter = connect(counterMapState)(Counter);
-
-const textMapState = (state, ownProps) => {
-  const stringId = createStringId(ownProps.idx, ownProps.inputId); //`${ownProps.idx}-${ownProps.remainingDepth}`;
-  const text = state.strings[stringId] || "unknown";
-
-  return { text, stringId };
-};
-
-const textMapDispatch = { initialize };
-
-class TextDisplay extends Component {
-  componentDidMount() {
-    const { stringId } = this.props;
-    this.props.initialize({ stringId });
-  }
-
-  render() {
-    const { text, stringId, children } = this.props;
-
-    return (
-      <div>
-        Text {stringId}:<br />
-        <textarea value={text} />
-        {children}
-      </div>
-    );
-  }
+function TextDisplay({ children, idx, inputId }) {
+  const { stringId, text } = useStore(state => {
+    const stringId = createStringId(idx, inputId); //`${ownProps.idx}-${ownProps.remainingDepth}`;
+    const text = state.strings[stringId] || "unknown";
+    return { text, stringId };
+  });
+  const { initialize, createStringId } = useActions(actions => actions.string);
+  useEffect(() => {
+    initialize(stringId);
+  }, []);
+  return (
+    <div>
+      Text {stringId}:<br />
+      <textarea value={text} />
+      {children}
+    </div>
+  );
 }
 TextDisplay.displayName = "TextDisplay";
-
-const ConnectedTextDisplay = connect(
-  textMapState,
-  textMapDispatch
-)(TextDisplay);
 
 class Slice extends Component {
   state = {};
@@ -74,19 +53,16 @@ class Slice extends Component {
 
       if (remainingDepth % TEXT_INPUT_MOD === 0) {
         renderedChild = (
-          <ConnectedTextDisplay
-            idx={idx}
-            inputId={remainingDepth / TEXT_INPUT_MOD}
-          >
+          <TextDisplay idx={idx} inputId={remainingDepth / TEXT_INPUT_MOD}>
             {renderedChild}
-          </ConnectedTextDisplay>
+          </TextDisplay>
         );
       }
 
       return renderedChild;
     }
 
-    return <ConnectedCounter idx={idx} />;
+    return <Counter idx={idx} />;
   }
 }
 Slice.displayName = "Slice";

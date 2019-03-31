@@ -1,21 +1,20 @@
 import React, { unstable_Profiler as Profiler } from "react";
 import { render } from "react-dom";
-import { Provider } from "react-redux";
-import { configureStore } from "@acemarke/redux-starter-kit";
+import { createStore, StoreProvider } from "easy-peasy";
 import seedrandom from "seedrandom";
 import "fps-emit";
 
-import reducer from "./reducers";
 import { doRandomAction } from "./actions";
+import model from "./reducers";
 import generateTree from "./generateTree";
 import Node from "./containers/Node";
 
 seedrandom("test seed", { global: true });
 
 const tree = generateTree(5000);
-const store = configureStore({
-  reducer,
-  preloadedState: tree
+console.log(tree);
+const store = createStore(model, {
+  initialState: tree
 });
 
 const renderResults = [];
@@ -46,9 +45,9 @@ function onAppRendered(
 
 render(
   <Profiler id="appProfiler" onRender={onAppRendered}>
-    <Provider store={store}>
+    <StoreProvider store={store}>
       <Node id={0} />
-    </Provider>
+    </StoreProvider>
   </Profiler>,
   document.getElementById("root")
 );

@@ -1,55 +1,36 @@
-import React from "react";
-import { connect } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useStore } from "easy-peasy";
 
-const mapState = (state, props) => state[props.sliceId][props.pairId];
-
-class Pair extends React.Component {
-  state = {
-    direction: "up",
-    value: this.props.value
-  };
-
-  static getDerivedStateFromProps(props, state) {
-    if (props.value === state.value) return null;
-
-    const direction = props.value > state.value ? "up" : "down";
-
-    return {
-      value: props.value,
-      direction
-    };
-  }
-
-  shouldComponentUpdate(nextProps) {
-    return this.props.value !== nextProps.value;
-  }
-
-  render() {
-    const { direction } = this.state;
-
-    return (
-      <li className="list-group-item">
-        <span>{this.props.name}</span>
+function Pair({ sliceId, pairId }) {
+  const { name, value } = useStore(state => state[sliceId][pairId], [
+    sliceId,
+    pairId
+  ]);
+  const [prevValue, setPrevValue] = useState(value);
+  useEffect(() => {
+    setPrevValue(value);
+  }, [value]);
+  const direction =
+    value === prevValue ? "up" : value > prevValue ? "up" : "down";
+  return (
+    <li className="list-group-item">
+      <span>{name}</span>
+      <span
+        className={
+          "pull-right " + (direction === "up" ? "text-success" : "text-warning")
+        }
+      >
         <span
           className={
-            "pull-right " +
-            (direction === "up" ? "text-success" : "text-warning")
+            "glyphicon " +
+            (direction === "up" ? "glyphicon-arrow-up" : "glyphicon-arrow-down")
           }
-        >
-          <span
-            className={
-              "glyphicon " +
-              (direction === "up"
-                ? "glyphicon-arrow-up"
-                : "glyphicon-arrow-down")
-            }
-          />
-          <span>{this.props.value}</span>
-        </span>
-      </li>
-    );
-  }
+        />
+        <span>{value}</span>
+      </span>
+    </li>
+  );
 }
 Pair.displayName = "Pair";
 
-export default connect(mapState)(Pair);
+export default Pair;

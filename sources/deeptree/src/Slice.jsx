@@ -1,17 +1,10 @@
 import React, { Component } from "react";
-import { connect } from "react-redux";
+import { useStore } from "easy-peasy";
 
-const mapStateToProps = (state, props) => {
-  return {
-    value: state[props.idx]
-  };
-};
-
-const Counter = ({ value }) => {
+const Counter = ({ idx }) => {
+  const value = useStore(state => state[idx], [idx]);
   return <div>Value: {value}</div>;
 };
-
-const ConnectedCounter = connect(mapStateToProps)(Counter);
 
 class Slice extends Component {
   state = {};
@@ -34,7 +27,7 @@ class Slice extends Component {
       );
     }
 
-    return <ConnectedCounter idx={idx} />;
+    return <Counter idx={idx} />;
   }
 }
 Slice.displayName = "Slice";

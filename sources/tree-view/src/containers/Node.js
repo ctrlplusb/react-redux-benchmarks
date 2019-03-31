@@ -1,73 +1,61 @@
-import React from 'react'
-import { Component } from 'react'
-import { connect } from 'react-redux'
-import * as actions from '../actions'
+import React, { useCallback } from "react";
+import { useStore, useActions } from "easy-peasy";
 
-export class Node extends Component {
-  handleIncrementClick = () => {
-    const { increment, id } = this.props
-    increment(id)
+let nextId = 0;
+
+export default function Node({ id, parentId }) {
+  const node = useStore(state => state[id], [id]);
+  if (!node) {
+    return null;
   }
-
-  handleAddChildClick = e => {
-    e.preventDefault()
-
-    const { addChild, createNode, id } = this.props
-    const childId = createNode().nodeId
-    addChild(id, childId)
-  }
-
-  handleRemoveClick = e => {
-    e.preventDefault()
-
-    const { removeChild, deleteNode, parentId, id } = this.props
-    removeChild(parentId, id)
-    deleteNode(id)
-  }
-
-  renderChild = childId => {
-    const { id } = this.props
-    return (
-      <li key={childId}>
-        <ConnectedNode id={childId} parentId={id} />
-      </li>
-    )
-  }
-
-  render() {
-    const { counter, parentId, childIds, id } = this.props
-    return (
-      <div>
-        Counter #{id}: {counter}
-        {' '}
-        <button className="increment" onClick={this.handleIncrementClick}>
-          +
-        </button>
-        {' '}
-        {typeof parentId !== 'undefined' &&
-          <a href="#" className="deleteNode" onClick={this.handleRemoveClick} // eslint-disable-line jsx-a11y/href-no-hash
-             style={{ color: 'lightgray', textDecoration: 'none' }}>
-            Delete
+  const { counter, childIds } = node;
+  const actions = useActions(actions => actions);
+  const increment = useCallback(() => actions.increment({ nodeId: id }), [id]);
+  const handleAddChildClick = useCallback(e => {
+    e.preventDefault();
+    const nodeId = `new_${nextId++}`;
+    const childId = actions.createNode({ nodeId });
+    actions.addChild({ nodeId: id, childId });
+  }, [id]);
+  const handleRemoveClick = useCallback(e => {
+    e.preventDefault();
+    actions.removeChild({ nodeId: parentId, childId: id });
+    actions.deleteNode({ nodeId: id });
+  }, [id, parentId]);
+  return (
+    <div>
+      Counter #{id}: {counter}{" "}
+      <button className="increment" onClick={increment}>
+        +
+      </button>{" "}
+      {typeof parentId !== "undefined" && (
+        <a
+          href="#"
+          className="deleteNode"
+          onClick={handleRemoveClick} // eslint-disable-line jsx-a11y/href-no-hash
+          style={{ color: "lightgray", textDecoration: "none" }}
+        >
+          Delete
+        </a>
+      )}
+      <ul>
+        {childIds.map(childId => {
+          return (
+            <li key={childId}>
+              <Node id={childId} parentId={id} />
+            </li>
+          );
+        })}
+        <li key="add">
+          <a
+            href="#"
+            className="addChild" // eslint-disable-line jsx-a11y/href-no-hash
+            onClick={handleAddChildClick}
+          >
+            Add child
           </a>
-        }
-        <ul>
-          {childIds.map(this.renderChild)}
-          <li key="add">
-            <a href="#" className="addChild" // eslint-disable-line jsx-a11y/href-no-hash
-              onClick={this.handleAddChildClick}
-            >
-              Add child
-            </a>
-          </li>
-        </ul>
-      </div>
-    )
-  }
+        </li>
+      </ul>
+    </div>
+  );
 }
-
-function mapStateToProps(state, ownProps) {
-  return state[ownProps.id]
-}
-
-const ConnectedNode = connect(mapStateToProps, actions)(Node)
-export default ConnectedNode

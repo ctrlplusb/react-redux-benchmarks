@@ -1,14 +1,12 @@
-import { configureStore } from "redux-starter-kit";
+import { createStore } from "easy-peasy";
 
 import countersReducer from "./counters";
 import stringsReducer from "./strings";
 
 export default function configureAppStore() {
-  const store = configureStore({
-    reducer: {
-      counters: countersReducer,
-      strings: stringsReducer
-    }
+  const store = createStore({
+    counters: countersReducer,
+    strings: stringsReducer
   });
 
   return store;

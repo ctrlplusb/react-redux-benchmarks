@@ -2,33 +2,23 @@ import React, { unstable_Profiler as Profiler } from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import "fps-emit";
-import { createStore, combineReducers } from "redux";
-import { Provider } from "react-redux";
+import { action, createStore, StoreProvider } from "easy-peasy";
 import App from "./App";
-
-import { addTweet } from "./actions";
 
 import * as c from "./constants";
 
-const highOrderSliceReducer = (sliceId = "") => (state = [], action) => {
-  switch (action.type) {
-    case `${c.ADD_TWEET}_${sliceId}`: {
-      return [...state, action.tweet];
-    }
-    default: {
-      return state;
-    }
-  }
-};
-
-const reducers = Array(c.NUMBER_OF_SLICES)
+const model = Array(c.NUMBER_OF_SLICES)
   .fill(0)
   .reduce((acc, curr, i) => {
-    acc[i] = highOrderSliceReducer(i);
+    acc[i] = [];
     return acc;
   }, {});
 
-const store = createStore(combineReducers(reducers));
+model.addTweet = action((state, { sliceId, tweet }) => {
+  state[sliceId].push(tweet);
+});
+
+const store = createStore(model);
 
 const renderResults = [];
 window.renderResults = renderResults;
@@ -58,16 +48,16 @@ function onAppRendered(
 
 ReactDOM.render(
   <Profiler id="appProfiler" onRender={onAppRendered}>
-    <Provider store={store}>
+    <StoreProvider store={store}>
       <App />
-    </Provider>
+    </StoreProvider>
   </Profiler>,
   document.getElementById("root")
 );
 
 function addTweetInRandomSlice() {
   const sliceId = Math.floor(Math.random() * c.NUMBER_OF_SLICES);
-  store.dispatch(addTweet(sliceId));
+  store.dispatch.addTweet({ sliceId, tweet: "fabulous" });
 }
 
 setInterval(addTweetInRandomSlice, 13);

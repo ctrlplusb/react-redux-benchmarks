@@ -1,16 +1,14 @@
 module.exports = function override(config, env) {
-    //do stuff with the webpack config...
-    console.log(`Environment: ${env}`)
+  //do stuff with the webpack config...
+  console.log(`Environment: ${env}`);
 
-    if(env === "production") {
-        config.externals = {
-            "react" : "React",
-            "redux" : "Redux",
-            "react-dom" : "ReactDOM",
-            "react-redux" : "ReactRedux",
-        }
-    }
+  if (env === "production") {
+    config.externals = {
+      react: "React",
+      redux: "Redux",
+      "react-dom": "ReactDOM"
+    };
+  }
 
-
-    return config;
-}
+  return config;
+};

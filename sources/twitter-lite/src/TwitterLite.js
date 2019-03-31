@@ -1,14 +1,5 @@
-import { connect } from "react-redux";
-import { createSelector } from "reselect";
+import { useStore } from "easy-peasy";
 import React, { Component } from "react";
-
-const exampleMapStateToProps = createSelector(
-  (state, props) => "foobar",
-  foo => ({ foo })
-);
-
-const foobar = () => {};
-const exampleMapDispatchToProps = { foobar };
 
 class Internal extends Component {
   render() {
@@ -16,30 +7,19 @@ class Internal extends Component {
   }
 }
 
-class InternalContainer extends Component {
-  render() {
-    return <Internal />;
-  }
+function InternalContainer() {
+  const foo = useStore(() => "foobar");
+  return <Internal />;
 }
 
-const InternalContainerConnected = connect(
-  exampleMapStateToProps,
-  exampleMapDispatchToProps
-)(InternalContainer);
-
-class Example extends Component {
-  render() {
-    return <InternalContainerConnected />;
-  }
+function Example() {
+  const foo = useStore(() => "foobar");
+  return <InternalContainer />;
 }
 
-class ExampleContainer extends Component {
-  render() {
-    return <Example />;
-  }
+function ExampleContainer() {
+  const foo = useStore(() => "foobar");
+  return <Example />;
 }
 
-export default connect(
-  exampleMapStateToProps,
-  exampleMapDispatchToProps
-)(ExampleContainer);
+export default ExampleContainer;

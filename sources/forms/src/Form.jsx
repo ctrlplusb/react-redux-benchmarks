@@ -1,43 +1,29 @@
-import React from "react";
-import { connect } from "react-redux";
-
-import { updateInput } from "./inputs";
+import React, { useCallback } from "react";
+import { useStore, useActions } from "easy-peasy";
 
 import * as c from "./constants";
 
-const mapState = (state, ownProps) => {
-  return {
-    text: state[ownProps.id]
-  };
-};
+function Form({ id }) {
+  const text = useStore(s => s[id], [id]);
+  const updateInput = useActions(a => a.updateInput);
+  const onChange = useCallback(
+    e => updateInput({ inputId: id, text: e.target.value }),
+    [updateInput]
+  );
 
-const mapDispatch = { updateInput };
+  const fillers = Array.from({
+    length: c.NUMBER_OF_CHECKBOXES_PER_FORM
+  }).map((item, i) => <input type="checkbox" key={i} />);
 
-class Form extends React.Component {
-  onChange = e => {
-    this.props.updateInput({ inputId: this.props.id, text: e.target.value });
-  };
-
-  render() {
-    const { text, id } = this.props;
-
-    const fillers = Array.from({
-      length: c.NUMBER_OF_CHECKBOXES_PER_FORM
-    }).map((item, i) => <input type="checkbox" key={i} />);
-
-    return (
-      <React.Fragment>
-        <form style={{ display: "flex", alignItems: "flex-start" }}>
-          Form {id}:
-          <textarea id={`input-${id}`} value={text} onChange={this.onChange} />
-        </form>
-        <div>{fillers}</div>
-      </React.Fragment>
-    );
-  }
+  return (
+    <React.Fragment>
+      <form style={{ display: "flex", alignItems: "flex-start" }}>
+        Form {id}:
+        <textarea id={`input-${id}`} value={text} onChange={onChange} />
+      </form>
+      <div>{fillers}</div>
+    </React.Fragment>
+  );
 }
 
-export default connect(
-  mapState,
-  mapDispatch
-)(Form);
+export default Form;

@@ -5,15 +5,14 @@ import App from "./App";
 import "fps-emit";
 
 import * as c from "./constants";
-import { initialize, incrementRandomCounter, incrementMany } from "./counters";
 
-import { Provider } from "react-redux";
+import { StoreProvider } from "easy-peasy";
 
 import configureStore from "./configureStore";
 
 const store = configureStore();
 
-store.dispatch(initialize({ numberOfCounters: c.NUMBER_OF_SLICES }));
+store.dispatch.initialize({ numberOfCounters: c.NUMBER_OF_SLICES });
 
 const renderResults = [];
 window.renderResults = renderResults;
@@ -43,19 +42,19 @@ function onAppRendered(
 
 ReactDOM.render(
   <Profiler id="appProfiler" onRender={onAppRendered}>
-    <Provider store={store}>
+    <StoreProvider store={store}>
       <App />
-    </Provider>
+    </StoreProvider>
   </Profiler>,
   document.getElementById("root")
 );
 
 function doRandomUpdate() {
-  store.dispatch(incrementRandomCounter());
+  store.dispatch.incrementRandomCounter();
 }
 
 function doUpdateMany(mod) {
-  store.dispatch(incrementMany({ mod }));
+  store.dispatch.incrementMany({ mod });
 }
 
 setInterval(doRandomUpdate, 13);

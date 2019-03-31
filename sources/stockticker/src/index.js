@@ -5,16 +5,15 @@ import App from "./App";
 import "fps-emit";
 
 import * as c from "./constants";
-import { updatePair, updateRandomPairInSlice, fillPairs } from "./pairActions";
 
-import { Provider } from "react-redux";
+import { StoreProvider } from "easy-peasy";
 
 import configureStore from "./configureStore";
 
 const store = configureStore();
 
 for (let i = 0; i < c.NUMBER_OF_SLICES; i++) {
-  store.dispatch(fillPairs(i));
+  store.dispatch.fillPairs({ sliceId: i });
 }
 
 const renderResults = [];
@@ -45,9 +44,9 @@ function onAppRendered(
 
 ReactDOM.render(
   <Profiler id="appProfiler" onRender={onAppRendered}>
-    <Provider store={store}>
+    <StoreProvider store={store}>
       <App />
-    </Provider>
+    </StoreProvider>
   </Profiler>,
   document.getElementById("root")
 );
@@ -60,7 +59,7 @@ function updateRandomPairInSlice() {
 }
 */
 function doRandomUpdate() {
-  store.dispatch(updateRandomPairInSlice());
+  store.dispatch.updateRandomPairInSlice();
 }
 
 //setInterval(updateRandomPairInSlice, 500);

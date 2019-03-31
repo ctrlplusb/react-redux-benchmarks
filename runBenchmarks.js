@@ -158,7 +158,7 @@ async function runBenchmarks() {
       const toRun = join(source, version);
       console.log(`  react-redux version: ${version}`);
       const browser = await puppeteer.launch({
-        //headless: false
+        // headless: false
       });
 
       const URL = "http://localhost:9999";

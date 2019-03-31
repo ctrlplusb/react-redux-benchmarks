@@ -1,19 +1,19 @@
 import React, { unstable_Profiler as Profiler } from "react";
 import ReactDOM from "react-dom";
-import { Provider } from "react-redux";
+import { StoreProvider } from "easy-peasy";
 import "./index.css";
 import App from "./App";
 import "fps-emit";
 
 import * as c from "./constants";
 
-import { initialize, typeTextInRandomInput } from "./inputs";
+import { typeTextInRandomInput } from "./inputs";
 
 import configureStore from "./configureStore";
 
 const store = configureStore();
 
-store.dispatch(initialize({ numberOfInputs: c.NUMBER_OF_INPUTS }));
+store.dispatch.initialize({ numberOfInputs: c.NUMBER_OF_INPUTS });
 
 const renderResults = [];
 window.renderResults = renderResults;
@@ -43,9 +43,9 @@ function onAppRendered(
 
 ReactDOM.render(
   <Profiler id="appProfiler" onRender={onAppRendered}>
-    <Provider store={store}>
+    <StoreProvider store={store}>
       <App />
-    </Provider>
+    </StoreProvider>
   </Profiler>,
   document.getElementById("root")
 );
